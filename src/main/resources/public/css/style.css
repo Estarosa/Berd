@@ -1,0 +1,25 @@
+body {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.footer {
+    padding-top: 19px;
+    padding-right: 15px;
+    padding-left: 15px;
+
+    color: #777;
+    border-top: 1px solid #e5e5e5;
+}
+.pane1{
+    position: absolute;
+    top: 20%;
+    left: 14%;
+    width: 40%;
+    background-color: white;
+}
+@media (min-width: 768px) {
+    .container {
+        max-width: 730px;
+    }
+}
