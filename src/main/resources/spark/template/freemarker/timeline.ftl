@@ -65,13 +65,13 @@
                 <#else>
                     <hr/>
                     <div class="well">
-                        There're no messages so far.
+                        There's nothing so far.
                     </div>
                 </#list>
             <#else>
                 <hr/>
                 <div class="well">
-                    There're no messages so far.
+                    There's nothing so far.
                 </div>
             </#if>
         </div>

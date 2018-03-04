@@ -29,13 +29,39 @@ public class MessageDaoImpl implements MessageDao {
 	}
 
 
+    public List<Message> getSearchUserFollowees(String search){
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("vr", search );
+        String sql = "select message.*,user.* from message, user where " +
+                "user.user_id = message.author_id "+
+                "and user.user_id in (select followee_id from follower,user " +
+                "where username = :vr and follower_id = user_id )" +
+                "and message.message_id in (Select max(message_id) from message group by author_id)"+
+                "order by message.pub_date desc";
+        List<Message> result = template.query(sql, params, UserMapper);
+
+        return result;
+    }
+    public List<Message> getSearchUserFollowers(String search){
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("vr", search );
+        String sql = "select message.*,user.* from message, user where " +
+                "user.user_id = message.author_id "+
+                "and user.user_id in (select follower_id from follower,user " +
+                "where username = :vr and followee_id = user_id )" +
+                "and message.message_id in (Select max(message_id) from message group by author_id)"+
+                "order by message.pub_date desc";
+        List<Message> result = template.query(sql, params, UserMapper);
+
+        return result;
+    }
     // search by user
 	public List<Message> getSearchUser(String search){
 	    Map<String, Object> params = new HashMap<String, Object>();
 		params.put("vr", search );
 		String sql = "select message.*,user.* from message, user where " +
 				"user.user_id = message.author_id and user.username like Concat('%',:vr,'%')"+
-				"and message.message_id in (Select max(message.message_id) from message group by message.author_id)"+
+				"and message.message_id in (Select max(message_id) from message group by author_id)"+
 				"order by message.pub_date desc";
 		List<Message> result = template.query(sql, params, UserMapper);
 
@@ -130,5 +156,6 @@ public class MessageDaoImpl implements MessageDao {
 
 		return m;
 	};
+
 
 }

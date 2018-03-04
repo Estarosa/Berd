@@ -26,6 +26,8 @@ public class MiniTwitService {
 	public List<Message> getSearchMessage(String search) {
 		return messageDao.getSearchMessage(search);
 	}
+	public List<Message> getSearchUserFollowers(String search){return messageDao.getSearchUserFollowers(search);}
+	public List<Message> getSearchUserFollowees(String search){return messageDao.getSearchUserFollowees(search);}
 
 	public List<Message> getUserFullTimelineMessages(User user) {
 		return messageDao.getUserFullTimelineMessages(user);

@@ -61,8 +61,8 @@ public class User {
 	public String validate() {
 		String error = null;
 		
-		if(StringUtils.isEmpty(username)) {
-			error = "You have to enter a username";
+		if(StringUtils.isEmpty(username) || username.charAt(0) == ' ' ) {
+			error = "You have to enter a valid username";
 		} else if(!EMAIL_ADDRESS_REGEX.matcher(email).matches()) {
 			error = "You have to enter a valid email address";
 		} else if(StringUtils.isEmpty(password)) {

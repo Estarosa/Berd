@@ -66,12 +66,22 @@ public class WebConfig {
             map.put("pageTitle", "Public Timeline");
             map.put("user", user);
             List<Message> messages;
-            if(search.charAt(0) == '#') {
-                search = search.substring(1);
-                messages = service.getSearchMessage(search);
+			String[] ary = search.split(":",2);
+			ary[0] = ary[0].trim();
+			if (ary.length>1) {
+				ary[1] = ary[1].replaceAll("^\\s+", "");
+			}
+            if(ary[0].equals("msg") && !ary[1].equals("")) {
+                messages = service.getSearchMessage(ary[1]);
+            }else if(ary[0].equals("usr") && !ary[1].equals("")){
+				messages = service.getSearchUser(ary[1]);
+			}else if (ary[0].equals("flwr")){
+				messages = service.getSearchUserFollowers(ary[1]);
+            }else if (ary[0].equals("flwe")){
+				messages = service.getSearchUserFollowees(ary[1]);
             }else{
-                messages = service.getSearchUser(search);
-            }
+				messages = service.getSearchUserFollowees("");
+				}
             map.put("messages", messages);
             return new ModelAndView(map, "timeline.ftl");
         }, new FreeMarkerEngine());
