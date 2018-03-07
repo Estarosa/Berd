@@ -306,26 +306,28 @@ public class WebConfig {
 		 * Registers a new message for the user.
 		 */
         post("/message", (req, res) -> {
-
-            System.out.println(req.contentType());
-            System.out.println(req.bodyAsBytes());
-            File uploadDir = new File("upload");
-            uploadDir.mkdir(); // create the upload directory if it doesn't exist
-            Path tempFile = Files.createTempFile(uploadDir.toPath(), "", "");
-            req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
-            InputStream input = req.raw().getPart("uploaded_file").getInputStream();  // getPart needs to use same "name" as input field in form
-            Files.copy(input, tempFile, StandardCopyOption.REPLACE_EXISTING);
+            String b = req.contentType();
+            System.out.println(b);
             User user = getAuthenticatedUser(req);
-            MultiMap<String> params = new MultiMap<String>();
-            UrlEncoded.decodeTo(req.queryParams("text"), params, "UTF-8");
-            Message m = new Message();
-            m.setUserId(user.getId());
-            m.setPubDate(new Date());
-            BeanUtils.populate(m, params);
-            System.out.println(m.getText());
-            service.addMessage(m);
-            System.out.println("5");
+            if (!b.equals("application/x-www-form-urlencoded")) {
+                File uploadDir = new File("upload");
+                uploadDir.mkdir(); // create the upload directory if it doesn't exist
+                Path tempFile = Files.createTempFile(uploadDir.toPath(), "", "");
+                req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
+                InputStream input = req.raw().getPart("uploaded_file").getInputStream();  // getPart needs to use same "name" as input field in form
+                Files.copy(input, tempFile, StandardCopyOption.REPLACE_EXISTING);
+                System.out.println("okok");
+            } else {
+                MultiMap<String> params = new MultiMap<String>();
+                UrlEncoded.decodeTo(req.body(), params, "UTF-8");
+                Message m = new Message();
+                m.setUserId(user.getId());
+                m.setPubDate(new Date());
+                BeanUtils.populate(m, params);
+                service.addMessage(m);
+            }
             res.redirect("/");
+
             return null;
         });
 		/*

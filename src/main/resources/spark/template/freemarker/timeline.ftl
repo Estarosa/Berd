@@ -18,18 +18,38 @@
                     <div class="panel-heading">
                         <h3 class="panel-title">What's on your mind ${user.username}?</h3>
                     </div>
-
                     <div class="panel-body">
-                        <form class="form-horizontal" action="/message" method="post" enctype="multipart/form-data" acceptcharset="UTF-8" >
+
+                        <form class="form-horizontal" action="/message" method="post">
                             <div class="input-group">
                                 <input type="text" name="text" class="form-control" required/>
-                                 <input type="file" name="uploaded_file" accept=".png" >
-                                 <span class="input-group-btn">
-                                       <button class="btn btn-primary" type="submit"> Share </button>
-                                 </span>
 
-                            </div>
+                            <span class="input-group-btn">
+                                  <button class="btn btn-primary" onclick="fnSubmit()" type="submit"> Share </button>
+                              </span>
+                              </div>
                         </form>
+                         <form class="form-horizontal" action="/message" method="post" enctype="multipart/form-data" >
+                                                 <div class="input-group">
+                                          <input type="file" id="1" name="uploaded_file" accept=".png" >
+                                          <button style="visibility:hidden;" id ="2" type="submit"></button>
+                                                 </div>
+
+
+
+                                            </form>
+                        <script>
+                                               function fnSubmit () {
+
+                                                  if (document.getElementById("1").value != '') {
+                                                            document.getElementById("2").click();
+
+                                                           }
+
+
+                                               }
+                                               </script>
+
                     </div>
                 </div>
             </#if>
