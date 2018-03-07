@@ -20,12 +20,14 @@
                     </div>
 
                     <div class="panel-body">
-                        <form class="form-horizontal" action="/message" method="post">
+                        <form class="form-horizontal" action="/message" method="post" enctype="multipart/form-data" acceptcharset="UTF-8" >
                             <div class="input-group">
                                 <input type="text" name="text" class="form-control" required/>
-                                <span class="input-group-btn">
-                                    <button class="btn btn-primary" type="submit"> Share </button>
-                                </span>
+                                 <input type="file" name="uploaded_file" accept=".png" >
+                                 <span class="input-group-btn">
+                                       <button class="btn btn-primary" type="submit"> Share </button>
+                                 </span>
+
                             </div>
                         </form>
                     </div>
@@ -55,6 +57,9 @@
                             </h4>
                         <#if message.text??>
                         ${message.text}
+                        </#if>
+                        <#if message.img??>
+                        <img class="media-object" src="${message.img}"/>
                         </#if>
                         <br/>
                            <#if message.pubDateStr??>

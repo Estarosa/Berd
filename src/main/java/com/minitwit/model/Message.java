@@ -1,5 +1,6 @@
 package com.minitwit.model;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -15,12 +16,9 @@ public class Message {
 	private Date pubDate;
 	
 	private String pubDateStr;
-	
+
 	private String gravatar;
 
-	public int getId() {
-		return id;
-	}
 
 	public void setId(int id) {
 		this.id = id;
