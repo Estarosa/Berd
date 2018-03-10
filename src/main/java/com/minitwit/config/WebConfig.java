@@ -2,20 +2,21 @@ package com.minitwit.config;
 
 import java.io.File;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUpload;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.FilenameUtils;
 import org.eclipse.jetty.util.MultiMap;
 import org.eclipse.jetty.util.UrlEncoded;
 
@@ -29,13 +30,21 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import spark.ModelAndView;
 import spark.Request;
 import spark.template.freemarker.FreeMarkerEngine;
+import spark.utils.IOUtils;
 import spark.utils.StringUtils;
 
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Part;
+import javax.xml.soap.Text;
 
 import static spark.Spark.*;
 
+@WebServlet("/messagev")
+@MultipartConfig
 public class WebConfig {
 	
 	private static final String USER_SESSION_ID = "user";
@@ -319,12 +328,33 @@ public class WebConfig {
             String b = req.contentType();
             System.out.println(b);
             User user = getAuthenticatedUser(req);
+
+            if (req.raw().getAttribute("org.eclipse.jetty.multipartConfig") == null) {
+                MultipartConfigElement multipartConfigElement = new MultipartConfigElement(System.getProperty("java.io.tmpdir"));
+                req.raw().setAttribute("org.eclipse.jetty.multipartConfig", multipartConfigElement);
+            }
+            Part file = req.raw().getPart("file");
+            Part name = req.raw().getPart("text");
+            String filename = file.getSubmittedFileName();
+            System.out.println(filename);
+            if(name.getSize() > 0){
+                try{
+                    filename = org.apache.commons.io.IOUtils.toString(name.getInputStream(), StandardCharsets.UTF_8);
+                    System.out.println(filename);
+                } catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+            Path filePath = Paths.get(".",filename);
+            Files.copy(file.getInputStream(),filePath);
+
+
             if (!b.equals("application/x-www-form-urlencoded")) {
                 File uploadDir = new File("upload");
                 uploadDir.mkdir(); // create the upload directory if it doesn't exist
                 Path tempFile = Files.createTempFile(uploadDir.toPath(), "", "");
                 req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
-                InputStream input = req.raw().getPart("uploaded_file").getInputStream();  // getPart needs to use same "name" as input field in form
+                InputStream input = req.raw().getPart("file").getInputStream();  // getPart needs to use same "name" as input field in form
                 Files.copy(input, tempFile, StandardCopyOption.REPLACE_EXISTING);
                 System.out.println("okok");
             } else {

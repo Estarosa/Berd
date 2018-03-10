@@ -20,36 +20,15 @@
                     </div>
                     <div class="panel-body">
 
-                        <form class="form-horizontal" action="/message" method="post">
+                        <form class="form-horizontal" action="/message" method="post" enctype="multipart/form-data">
                             <div class="input-group">
                                 <input type="text" name="text" class="form-control" required/>
-
+                                <input type="file" name="file" accept=".png" >
                             <span class="input-group-btn">
-                                  <button class="btn btn-primary" onclick="fnSubmit()" type="submit"> Share </button>
+                                  <button class="btn btn-primary" type="submit"> Share </button>
                               </span>
                               </div>
                         </form>
-                         <form class="form-horizontal" action="/message" method="post" enctype="multipart/form-data" >
-                                                 <div class="input-group">
-                                          <input type="file" id="1" name="uploaded_file" accept=".png" >
-                                          <button style="visibility:hidden;" id ="2" type="submit"></button>
-                                                 </div>
-
-
-
-                                            </form>
-                        <script>
-                                               function fnSubmit () {
-
-                                                  if (document.getElementById("1").value != '') {
-                                                            document.getElementById("2").click();
-
-                                                           }
-
-
-                                               }
-                                               </script>
-
                     </div>
                 </div>
             </#if>
