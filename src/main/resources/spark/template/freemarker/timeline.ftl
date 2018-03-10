@@ -66,20 +66,38 @@
                     <hr/>
 
                     <div class="media">
+                        <#if message.username??>
+                        <#if message.userId != 0 >
                         <a class="pull-left" href="/t/${message.username}">
+
                             <img class="media-object" src="${message.gravatar}"/>
-                        </a>
+                            </a>
+                         <#else>
+                          <a class="pull-left" target="_blank" href="http://www.google.com/search?q=${message.text}">
+                          </a>
+                             </#if>
+                        </#if>
                         <div class="media-body">
                             <h4 class="media-heading">
+                                <#if message.username??>
+                                <#if message.userId != 0 >
                                 <a href="/t/${message.username}">
                                 ${message.username}
                                 </a>
+                                <#else>
+                                <a target="_blank" href="http://www.google.com/search?q=${message.text}" >
+                                                                ${message.username}
+                                 </a>
+                                 </#if>
+                                 </#if>
                             </h4>
+
                         <#if message.text??>
+                        <#if message.userId != 0 >
                         ${message.text}
+                        <#else>
+                        #${message.text}
                         </#if>
-                        <#if message.img??>
-                        <img class="media-object" src="${message.img}"/>
                         </#if>
                         <br/>
                            <#if message.pubDateStr??>

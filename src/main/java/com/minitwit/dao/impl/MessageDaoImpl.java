@@ -1,8 +1,11 @@
 package com.minitwit.dao.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
@@ -26,6 +29,13 @@ public class MessageDaoImpl implements MessageDao {
 	@Autowired
 	public MessageDaoImpl(DataSource ds) {
 		template = new NamedParameterJdbcTemplate(ds);
+	}
+	public List<Message> getTrendingtags(String search){
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("vr", search);
+		String sql = "select top :vr tag , COUNT(tag) as c from hashtag group by tag order by c desc";
+		List<Message> result = template.query(sql, params, HashtagMapper);
+		return result;
 	}
 
 
@@ -127,9 +137,20 @@ public class MessageDaoImpl implements MessageDao {
         params.put("userId", m.getUserId());
         params.put("text", m.getText());
         params.put("pubDate", m.getPubDate());
-        
         String sql = "insert into message (author_id, text, pub_date) values (:userId, :text, :pubDate)";
-		template.update(sql, params);
+        template.update(sql, params);
+
+		String str = m.getText() ;
+		Pattern MY_PATTERN = Pattern.compile("#(\\S+)");
+		Matcher mat = MY_PATTERN.matcher(str);
+		while (mat.find()) {
+
+			params.put("tag", mat.group(1));
+			sql = "insert into Hashtag (tag) values (:tag)";
+			template.update(sql, params);
+			System.out.println("ok");
+		}
+
 	}
 	
 	private RowMapper<Message> messageMapper = (rs, rowNum) -> {
@@ -156,6 +177,22 @@ public class MessageDaoImpl implements MessageDao {
 
 		return m;
 	};
+	private RowMapper<Message> HashtagMapper = (rs, rowNum) -> {
+		Message m = new Message();
 
+		m.setId(0);
+		m.setUserId(0);
+		if(rs.getInt("c") == 1) {
+			m.setUsername(rowNum + 1 + ": Has been used " + rs.getInt("c") + " time.");
+		} else {
+			m.setUsername(rowNum + 1 + ": Has been used " + rs.getInt("c") + " times.");
+		}
+		m.setText(rs.getString("tag"));
+		m.setPubDate(null);
+		m.setGravatar(null);
+
+
+		return m;
+	};
 
 }

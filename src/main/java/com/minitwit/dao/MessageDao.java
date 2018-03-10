@@ -9,7 +9,7 @@ public interface MessageDao {
 	List<Message> getUserTimelineMessages(User user);
 
 	List<Message> getUserFullTimelineMessages(User user);
-	
+	List<Message> getTrendingtags(String i);
 	List<Message> getPublicTimelineMessages();
 
 	List<Message> getSearchMessage(String search);

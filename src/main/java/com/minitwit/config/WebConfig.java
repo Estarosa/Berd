@@ -92,7 +92,17 @@ public class WebConfig {
 				messages = service.getSearchUserFollowers(ary[1]);
             }else if (ary[0].equals("flwe")){
 				messages = service.getSearchUserFollowees(ary[1]);
-            }else{
+            }else if(ary[0].equals("top")) {
+                try {
+
+                    int b = Integer.parseInt(ary[1]);
+                    messages = service.getTrendingtags(ary[1]);
+
+
+                } catch (NumberFormatException e) {
+                    messages = service.getSearchUserFollowees("");
+                }
+            } else{
 				messages = service.getSearchUserFollowees("");
 				}
             map.put("messages", messages);
