@@ -19,6 +19,10 @@ public class Message {
 
 	private String gravatar;
 
+	private String img;
+
+	public void setImg(String img){this.img = img;}
+	public String getImg(){return img;}
 
 	public void setId(int id) {
 		this.id = id;

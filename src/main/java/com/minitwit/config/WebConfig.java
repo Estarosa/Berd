@@ -1,6 +1,7 @@
 package com.minitwit.config;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -43,12 +44,12 @@ import javax.xml.soap.Text;
 
 import static spark.Spark.*;
 
-@WebServlet("/messagev")
-@MultipartConfig
+
 public class WebConfig {
 	
 	private static final String USER_SESSION_ID = "user";
 	private MiniTwitService service;
+	private static int i = 0;
 
 	public WebConfig(MiniTwitService service) {
 		this.service = service;
@@ -336,7 +337,9 @@ public class WebConfig {
             Part file = req.raw().getPart("file");
             Part name = req.raw().getPart("text");
             String filename = file.getSubmittedFileName();
-            System.out.println(filename);
+            String s = filename;
+            Path filePath = Paths.get("./target/classes/public/images/",i + ".png");
+            System.out.println(filename.length() == 0);
             if(name.getSize() > 0){
                 try{
                     filename = org.apache.commons.io.IOUtils.toString(name.getInputStream(), StandardCharsets.UTF_8);
@@ -345,27 +348,29 @@ public class WebConfig {
                     e.printStackTrace();
                 }
             }
-            Path filePath = Paths.get(".",filename);
-            Files.copy(file.getInputStream(),filePath);
-
-
-            if (!b.equals("application/x-www-form-urlencoded")) {
-                File uploadDir = new File("upload");
-                uploadDir.mkdir(); // create the upload directory if it doesn't exist
-                Path tempFile = Files.createTempFile(uploadDir.toPath(), "", "");
-                req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
-                InputStream input = req.raw().getPart("file").getInputStream();  // getPart needs to use same "name" as input field in form
-                Files.copy(input, tempFile, StandardCopyOption.REPLACE_EXISTING);
+            if(s.length() != 0){
                 System.out.println("okok");
-            } else {
-                MultiMap<String> params = new MultiMap<String>();
+                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+                System.out.println("okok");
+                i++;
+            }
+               MultiMap<String> params = new MultiMap<String>();
                 UrlEncoded.decodeTo(req.body(), params, "UTF-8");
                 Message m = new Message();
                 m.setUserId(user.getId());
                 m.setPubDate(new Date());
-                BeanUtils.populate(m, params);
-                service.addMessage(m);
+                m.setText(filename);
+            if(s.length() != 0) {
+                m.setImg(i - 1 + ".png");
+            }else{
+                m.setImg(null);
             }
+
+                BeanUtils.populate(m, params);
+
+                service.addMessage(m);
+
+
             res.redirect("/");
 
             return null;
@@ -405,4 +410,7 @@ public class WebConfig {
 	private User getAuthenticatedUser(Request request) {
 		return request.session().attribute(USER_SESSION_ID);
 	}
+    private static void logInfo(Request req, Path tempFile) throws IOException, ServletException {
+
+    }
 }

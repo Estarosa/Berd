@@ -23,6 +23,7 @@ create table message (
   author_id integer not null,
   text varchar(160) not null,
   pub_date timestamp,
+  img varchar(160)
 );
 
 

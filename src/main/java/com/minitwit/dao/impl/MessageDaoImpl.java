@@ -137,7 +137,8 @@ public class MessageDaoImpl implements MessageDao {
         params.put("userId", m.getUserId());
         params.put("text", m.getText());
         params.put("pubDate", m.getPubDate());
-        String sql = "insert into message (author_id, text, pub_date) values (:userId, :text, :pubDate)";
+        params.put("img",m.getImg());
+        String sql = "insert into message (author_id, text, pub_date,img) values (:userId, :text, :pubDate, :img)";
         template.update(sql, params);
 
 		String str = m.getText() ;
@@ -148,7 +149,7 @@ public class MessageDaoImpl implements MessageDao {
 			params.put("tag", mat.group(1));
 			sql = "insert into Hashtag (tag) values (:tag)";
 			template.update(sql, params);
-			System.out.println("ok");
+
 		}
 
 	}
@@ -162,7 +163,8 @@ public class MessageDaoImpl implements MessageDao {
 		m.setText(rs.getString("text"));
 		m.setPubDate(rs.getTimestamp("pub_date"));
 		m.setGravatar(GravatarUtil.gravatarURL(rs.getString("email"), GRAVATAR_DEFAULT_IMAGE_TYPE, GRAVATAR_SIZE));
-		
+		m.setImg(rs.getString("img"));
+
 		return m;
 	};
 	private RowMapper<Message> UserMapper = (rs, rowNum) -> {
@@ -174,6 +176,7 @@ public class MessageDaoImpl implements MessageDao {
 		m.setText(null);
 		m.setPubDate(null);
 		m.setGravatar(GravatarUtil.gravatarURL(rs.getString("email"), GRAVATAR_DEFAULT_IMAGE_TYPE, GRAVATAR_SIZE));
+		m.setImg(null);
 
 		return m;
 	};
@@ -190,6 +193,7 @@ public class MessageDaoImpl implements MessageDao {
 		m.setText(rs.getString("tag"));
 		m.setPubDate(null);
 		m.setGravatar(null);
+		m.setImg(null);
 
 
 		return m;

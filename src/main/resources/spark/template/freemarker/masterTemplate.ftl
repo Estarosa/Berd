@@ -24,7 +24,7 @@
 
             <a class="navbar-brand" href="/">Berd</a>
             <a href="/">
-            <image src="images/Berd.png" style="width:30px;height:30px;top:18px;left:65px;position: absolute;" alt ="Berd"/>
+            <image src="../images/Berd.png" style="width:30px;height:30px;top:18px;left:65px;position: absolute;" alt ="Berd"/>
             </a>
                 <div class="pane1">
                     <form class="form-horizontal" action="/sh" method="get">

@@ -78,6 +78,9 @@
                         #${message.text}
                         </#if>
                         </#if>
+                        <#if message.img??>
+                         <img class="media-object" src="../images/${message.img}"/>
+                        </#if>
                         <br/>
                            <#if message.pubDateStr??>
                             <small>&mdash; ${message.pubDateStr}</small>
