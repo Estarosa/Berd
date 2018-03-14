@@ -79,7 +79,10 @@
                         </#if>
                         </#if>
                         <#if message.img??>
-                         <img class="media-object" src="../images/${message.img}"/>
+                         <img width="400" class="media-object" src="../images/${message.img}"/>
+                         <video width="400" controls>
+                           <source src="../images/${message.img}">
+                         </video>
                         </#if>
                         <br/>
                            <#if message.pubDateStr??>
