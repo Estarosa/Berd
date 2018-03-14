@@ -23,7 +23,7 @@
                         <form class="form-horizontal" action="/message" method="post" enctype="multipart/form-data">
                             <div class="input-group">
                                 <input type="text" name="text" class="form-control" required/>
-                                <input type="file" name="file" accept=".png" >
+                                <input type="file" name="file"  >
                             <span class="input-group-btn">
                                   <button class="btn btn-primary" type="submit"> Share </button>
                               </span>

@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.fileupload.FileItem;
@@ -326,8 +327,6 @@ public class WebConfig {
 		 * Registers a new message for the user.
 		 */
         post("/message", (req, res) -> {
-            String b = req.contentType();
-            System.out.println(b);
             User user = getAuthenticatedUser(req);
 
             if (req.raw().getAttribute("org.eclipse.jetty.multipartConfig") == null) {
@@ -335,14 +334,15 @@ public class WebConfig {
                 req.raw().setAttribute("org.eclipse.jetty.multipartConfig", multipartConfigElement);
             }
             Part file = req.raw().getPart("file");
-            Part name = req.raw().getPart("text");
+            Part text = req.raw().getPart("text");
             String filename = file.getSubmittedFileName();
             String s = filename;
-            Path filePath = Paths.get("./target/classes/public/images/",i + ".png");
+			String[] ary = s.split(Pattern.quote("."));
+            Path filePath = Paths.get("./target/classes/public/images/",i + "."+ary[ary.length - 1]);
             System.out.println(filename.length() == 0);
-            if(name.getSize() > 0){
+            if(text.getSize() > 0){
                 try{
-                    filename = org.apache.commons.io.IOUtils.toString(name.getInputStream(), StandardCharsets.UTF_8);
+                    filename = org.apache.commons.io.IOUtils.toString(text.getInputStream(), StandardCharsets.UTF_8);
                     System.out.println(filename);
                 } catch(Exception e){
                     e.printStackTrace();
@@ -361,7 +361,7 @@ public class WebConfig {
                 m.setPubDate(new Date());
                 m.setText(filename);
             if(s.length() != 0) {
-                m.setImg(i - 1 + ".png");
+                m.setImg(i - 1 + "."+ary[ary.length - 1]);
             }else{
                 m.setImg(null);
             }
