@@ -79,8 +79,21 @@
                         </#if>
                         </#if>
                         <#if message.img??>
-                         <img width="400" class="media-object" src="../images/${message.img}"/>
-                         <video width="400" controls>
+                        <br>
+                      <script type="text/javascript">
+                          (function(window) {
+                              function setupVideo()
+                              {
+                                  var v = document.getElementById('vid');
+                                  v.addEventListener('mouseover', function() { this.controls = true; }, false);
+                                  v.addEventListener('mouseout', function() { this.controls = false; }, false);
+                              }
+
+                              window.addEventListener('load', setupVideo, false);
+                          })(window);
+                      </script>
+                         <video id="vid" style="max-width:500px;max-height:300px;height:expression(this.height > 300 ? 300: true);width: expression(this.width > 400 ? 400: true);" poster="../images/${message.img}">
+
                            <source src="../images/${message.img}">
                          </video>
                         </#if>

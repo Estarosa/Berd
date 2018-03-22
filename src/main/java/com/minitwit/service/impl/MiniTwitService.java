@@ -2,8 +2,7 @@ package com.minitwit.service.impl;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+
 
 import com.minitwit.dao.MessageDao;
 import com.minitwit.dao.UserDao;
@@ -12,14 +11,14 @@ import com.minitwit.model.Message;
 import com.minitwit.model.User;
 import com.minitwit.util.PasswordUtil;
 
-@Service
+
 public class MiniTwitService {
 	
-	@Autowired
+
 	private UserDao userDao;
 	
-	@Autowired
 	private MessageDao messageDao;
+
 	public List<Message> getSearchUser(String search) {
 		return messageDao.getSearchUser(search);
 	}

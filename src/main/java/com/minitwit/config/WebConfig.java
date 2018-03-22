@@ -19,6 +19,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.spark.sql.SparkSession;
 import org.eclipse.jetty.util.MultiMap;
 import org.eclipse.jetty.util.UrlEncoded;
 
@@ -47,7 +48,8 @@ import static spark.Spark.*;
 
 
 public class WebConfig {
-	
+
+
 	private static final String USER_SESSION_ID = "user";
 	private MiniTwitService service;
 	private static int i = 0;

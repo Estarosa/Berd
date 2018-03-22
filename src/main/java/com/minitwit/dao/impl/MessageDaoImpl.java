@@ -9,33 +9,31 @@ import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.stereotype.Repository;
 
+import com.minitwit.config.SpSql;
 import com.minitwit.dao.MessageDao;
 import com.minitwit.model.Message;
 import com.minitwit.model.User;
 import com.minitwit.util.GravatarUtil;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.*;
 
-@Repository
+import static jdk.nashorn.internal.objects.NativeDebug.map;
+
 public class MessageDaoImpl implements MessageDao {
 	
 	private static final String GRAVATAR_DEFAULT_IMAGE_TYPE = "monsterid";
 	private static final int GRAVATAR_SIZE = 48;
-	private NamedParameterJdbcTemplate template;
+	private static SpSql spark;
 
-	@Autowired
-	public MessageDaoImpl(DataSource ds) {
-		template = new NamedParameterJdbcTemplate(ds);
+
+	public MessageDaoImpl(SpSql spark) {
+		this.spark = spark ;
 	}
+
 	public List<Message> getTrendingtags(String search){
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("vr", search);
-		String sql = "select top :vr tag , COUNT(tag) as c from hashtag group by tag order by c desc";
-		List<Message> result = template.query(sql, params, HashtagMapper);
-		return result;
+		String sql = "select top" + search + " tag , COUNT(tag) as c from hashtag group by tag order by c desc";
+		return HashtagMapper(spark.get().sql(sql));
 	}
 
 
@@ -180,23 +178,29 @@ public class MessageDaoImpl implements MessageDao {
 
 		return m;
 	};
-	private RowMapper<Message> HashtagMapper = (rs, rowNum) -> {
-		Message m = new Message();
+	private List<Message> HashtagMapper( Dataset<Row> s) {
 
-		m.setId(0);
-		m.setUserId(0);
-		if(rs.getInt("c") == 1) {
-			m.setUsername(rowNum + 1 + ": Has been used " + rs.getInt("c") + " time.");
-		} else {
-			m.setUsername(rowNum + 1 + ": Has been used " + rs.getInt("c") + " times.");
-		}
-		m.setText(rs.getString("tag"));
-		m.setPubDate(null);
-		m.setGravatar(null);
-		m.setImg(null);
+		Dataset<Message> res = s.map(
+				(MapFunction<Row, Message>) rs -> {
+					int count = 0;
+					count++;
+					Message m = new Message();
+					m.setId(0);
+					m.setUserId(0);
+					if (Integer.parseInt(rs.getAs("c") )== 1) {
+						m.setUsername(count + ": Has been used " + rs.getAs("c") + " time.");
+					} else {
+						m.setUsername(count + ": Has been used " + rs.getAs("c") + " times.");
+					}
+					m.setText(rs.getAs("tag"));
+					m.setPubDate(null);
+					m.setGravatar(null);
+					m.setImg(null);
 
 
-		return m;
-	};
-
+					return m;
+				},
+				Encoders.bean(Message.class));
+		return res.collectAsList();
+	}
 }
