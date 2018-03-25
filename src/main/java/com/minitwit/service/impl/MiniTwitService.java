@@ -3,9 +3,11 @@ package com.minitwit.service.impl;
 import java.util.List;
 
 
-
+import com.minitwit.config.SpSql;
 import com.minitwit.dao.MessageDao;
 import com.minitwit.dao.UserDao;
+import com.minitwit.dao.impl.MessageDaoImpl;
+import com.minitwit.dao.impl.UserDaoImpl;
 import com.minitwit.model.LoginResult;
 import com.minitwit.model.Message;
 import com.minitwit.model.User;
@@ -15,9 +17,15 @@ import com.minitwit.util.PasswordUtil;
 public class MiniTwitService {
 	
 
-	private UserDao userDao;
+	private UserDao userDao ;
 	
-	private MessageDao messageDao;
+	private MessageDao messageDao ;
+
+	public MiniTwitService(){
+		SpSql spark = new SpSql();
+		userDao = new UserDaoImpl(spark);
+		messageDao = new MessageDaoImpl(spark);
+		}
 
 	public List<Message> getSearchUser(String search) {
 		return messageDao.getSearchUser(search);

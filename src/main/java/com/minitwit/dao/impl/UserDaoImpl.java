@@ -6,35 +6,34 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.stereotype.Repository;
+import com.minitwit.config.SpSql;
+import com.minitwit.model.Message;
+import com.minitwit.util.GravatarUtil;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.Row;
+
 
 import com.minitwit.dao.UserDao;
 import com.minitwit.model.User;
 
-@Repository
-public class UserDaoImpl implements UserDao {
-	
-	private NamedParameterJdbcTemplate template;
 
-	@Autowired
-	public UserDaoImpl(DataSource ds) {
-		template = new NamedParameterJdbcTemplate(ds);
+public class UserDaoImpl implements UserDao {
+
+	private static SpSql spark;
+
+	public UserDaoImpl(SpSql spark) {
+		this.spark = spark;
 	}
 
-	@Override
+
 	public User getUserbyUsername(String username) {
-		Map<String, Object> params = new HashMap<String, Object>();
-        params.put("name", username);
-        
-		String sql = "SELECT * FROM user WHERE username=:name";
-		
-        List<User> list = template.query(
-                    sql,
-                    params,
-                    userMapper);
+
+
+		String sql = "SELECT * FROM user WHERE username="+username+"";
+
+		List<User> list = userMapper(spark.get().sql(sql));
         
         User result = null;
         if(list != null && !list.isEmpty()) {
@@ -44,62 +43,60 @@ public class UserDaoImpl implements UserDao {
 		return result;
 	}
 
-	@Override
+
 	public void insertFollower(User follower, User followee) {
-		Map<String, Object> params = new HashMap<String, Object>();
-        params.put("follower", follower.getId());
-        params.put("followee", followee.getId());
+
         
-		String sql = "insert into follower (follower_id, followee_id) values (:follower, :followee)";
-		
-        template.update(sql,  params);
+		String sql = "insert into follower (follower_id, followee_id) values ("+follower.getId()+", "+followee.getId()+")";
+
+		spark.get().sql(sql);
 	}
 
-	@Override
+
 	public void deleteFollower(User follower, User followee) {
-		Map<String, Object> params = new HashMap<String, Object>();
-        params.put("follower", follower.getId());
-        params.put("followee", followee.getId());
+
         
-		String sql = "delete from follower where follower_id = :follower and followee_id = :followee";
-		
-        template.update(sql,  params);
+		String sql = "delete from follower where follower_id = "+follower.getId()+" and followee_id = "+followee.getId()+"";
+
+		spark.get().sql(sql);
 	}
 	
-	@Override
+
 	public boolean isUserFollower(User follower, User followee) {
-		Map<String, Object> params = new HashMap<String, Object>();
-        params.put("follower", follower.getId());
-        params.put("followee", followee.getId());
+
         
 		String sql = "select count(1) from follower where " +
-            "follower.follower_id = :follower and follower.followee_id = :followee";
+            "follower.follower_id = "+follower.getId()+" and follower.followee_id = "+followee.getId()+"";
 		
-		Long l = template.queryForObject(sql, params, Long.class);
+		List<User> list = userMapper(spark.get().sql(sql));
 		
-		return l > 0;
+		return list != null && !list.isEmpty();
 	}
 
-	@Override
+
 	public void registerUser(User user) {
-		Map<String, Object> params = new HashMap<String, Object>();
-        params.put("username", user.getUsername());
-        params.put("email", user.getEmail());
-        params.put("pw", user.getPassword());
+
         
-		String sql = "insert into user (username, email, pw) values (:username, :email, :pw)";
-		
-        template.update(sql,  params);
+		String sql = "insert into user (username, email, pw) values ("+user.getUsername()+", "+user.getEmail()+", "+user.getPassword()+")";
+
+		spark.get().sql(sql);
 	}
 
-	private RowMapper<User> userMapper = (rs, rowNum) -> {
-		User u = new User();
-		
-		u.setId(rs.getInt("user_id"));
-		u.setEmail(rs.getString("email"));
-		u.setUsername(rs.getString("username"));
-		u.setPassword(rs.getString("pw"));
-		
-		return u;
-	};
+	private List<User> userMapper(Dataset<Row> s) {
+
+		Dataset<User> res = s.map(
+				(MapFunction<Row, User>) rs -> {
+					User u = new User();
+
+					u.setId(rs.getAs("user_id"));
+					u.setEmail(rs.getAs("email"));
+					u.setUsername(rs.getAs("username"));
+					u.setPassword(rs.getAs("pw"));
+
+					return u;
+				},
+				Encoders.bean(User.class));
+		System.out.print("ok uM");
+		return res.collectAsList();
+	}
 }
