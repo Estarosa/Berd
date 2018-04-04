@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Message {
+
 	private int id;
 	
 	private int userId;
@@ -26,6 +27,10 @@ public class Message {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public int getId() {
+		return id;
 	}
 
 	public int getUserId() {
@@ -60,6 +65,8 @@ public class Message {
 		this.pubDate = pubDate;
 		if(pubDate != null) {
 			pubDateStr = new SimpleDateFormat("yyyy-MM-dd @ HH:mm").format(pubDate);
+		}else{
+			System.out.println("wtf");
 		}
 	}
 

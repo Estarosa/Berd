@@ -109,6 +109,7 @@ public class WebConfig {
                 try {
 
                     int b = Integer.parseInt(ary[1]);
+                    System.out.println(b);
                     messages = service.getTrendingtags(ary[1]);
 
 
@@ -142,14 +143,12 @@ public class WebConfig {
 		get("/t/:username", (req, res) -> {
 			String username = req.params(":username");
 			User profileUser = service.getUserbyUsername(username);
-			
 			User authUser = getAuthenticatedUser(req);
 			boolean followed = false;
 			if(authUser != null) {
 				followed = service.isUserFollower(authUser, profileUser);
 			}
 			List<Message> messages = service.getUserTimelineMessages(profileUser);
-			
 			Map<String, Object> map = new HashMap<>();
 			map.put("pageTitle", username + "'s Timeline");
 			map.put("user", authUser);
@@ -351,9 +350,7 @@ public class WebConfig {
                 }
             }
             if(s.length() != 0){
-                System.out.println("okok");
                 Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-                System.out.println("okok");
                 i++;
             }
                MultiMap<String> params = new MultiMap<String>();
