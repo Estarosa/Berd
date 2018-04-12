@@ -18,6 +18,7 @@ import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
 
 import static jdk.nashorn.internal.objects.NativeDebug.map;
+import static org.apache.spark.sql.functions.*;
 
 public class MessageDaoImpl implements MessageDao {
 	
@@ -31,9 +32,8 @@ public class MessageDaoImpl implements MessageDao {
 	}
 
 	public List<Message> getTrendingtags(String search){
-		String sql = "select hashtag.tag , COUNT(hashtag.tag) as c from hashtag group by hashtag.tag order by c desc LIMIT "+search;
-		spark.get().sql(sql).show();
-		return HashtagMapper(spark.get().sql(sql));
+		String sql = "select row_number() over(order by tag asc) as a,hashtag.tag , COUNT(hashtag.tag) as c from hashtag group by hashtag.tag order by c desc LIMIT "+search;
+		return HashtagMapper(spark.get().newSession().sql(sql));
 	}
 
 
@@ -45,7 +45,7 @@ public class MessageDaoImpl implements MessageDao {
                 "and message.message_id in (Select max(message_id) from message group by author_id)"+
                 "order by message.pub_date desc";
 		spark.get().sql(sql).show();
-        return UserMapper(spark.get().sql(sql));
+        return UserMapper(spark.get().newSession().sql(sql));
     }
     public List<Message> getSearchUserFollowers(String search){
         String sql = "select message.*,user.* from message, user where " +
@@ -55,7 +55,7 @@ public class MessageDaoImpl implements MessageDao {
                 "and message.message_id in (Select max(message_id) from message group by author_id)"+
                 "order by message.pub_date desc";
 		spark.get().sql(sql).show();
-        return UserMapper(spark.get().sql(sql));
+        return UserMapper(spark.get().newSession().sql(sql));
     }
     // search by user
 	public List<Message> getSearchUser(String search){
@@ -65,7 +65,7 @@ public class MessageDaoImpl implements MessageDao {
 				"and message.message_id in (Select max(message_id) from message group by author_id)"+
 				"order by message.pub_date desc";
 		spark.get().sql(sql).show();
-		return UserMapper(spark.get().sql(sql));
+		return UserMapper(spark.get().newSession().sql(sql));
 	}
 
 	// search by message
@@ -170,18 +170,16 @@ public class MessageDaoImpl implements MessageDao {
 		return res.collectAsList();
 	}
 	private List<Message> HashtagMapper( Dataset<Row> s) {
-        Dataset<Message> res = s.map(
+		Dataset<Message> res = s.map(
 				(MapFunction<Row, Message>) rs -> {
-					int count = 0;
-					count++;
 					Message m = new Message();
 					m.setId(0);
 					m.setUserId(0);
 					int k = (int)(long)rs.getAs("c");
 					if(k == 1) {
-						m.setUsername(count + ": Has been used " + rs.getAs("c") + " time.");
+						m.setUsername( rs.getAs("a")+ ": Has been used " + rs.getAs("c") + " time.");
 					} else {
-						m.setUsername(count + ": Has been used " + rs.getAs("c") + " times.");
+						m.setUsername( rs.getAs("a")+ ": Has been used " + rs.getAs("c") + " times.");
 					}
 					m.setText(rs.getAs("tag"));
 					m.setPubDate(null);

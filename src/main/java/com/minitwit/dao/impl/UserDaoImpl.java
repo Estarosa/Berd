@@ -56,9 +56,9 @@ public class UserDaoImpl implements UserDao {
 	public void deleteFollower(User follower, User followee) {
 
         
-		String sql = "delete from follower where follower_id = '"+follower.getId()+"' and followee_id = '"+followee.getId()+"'";
-
-		spark.get().sql(sql);
+		String sql = "select * from follower where follower_id != '"+follower.getId()+"' or followee_id != '"+followee.getId()+"'";
+		Dataset<Row> followerDS = spark.get().sql(sql);
+		followerDS.createOrReplaceTempView("follower");
 	}
 	
 

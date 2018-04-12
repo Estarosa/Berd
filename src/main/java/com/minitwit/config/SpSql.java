@@ -2,10 +2,9 @@ package com.minitwit.config;
 
 import com.minitwit.model.Message;
 import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SQLContext;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.*;
+import org.eclipse.jetty.websocket.common.frames.DataFrame;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -18,7 +17,8 @@ public class SpSql {
     private static int j = 0;
     public SpSql(){
         String warehouseLocation = new File("spark-warehouse").getAbsolutePath();
-        spark = SparkSession
+
+      spark = SparkSession
                 .builder()
                 .master("local")
                 .appName("Berd")
@@ -51,16 +51,40 @@ public class SpSql {
                 "  pw varchar(255) " +
                 ")");
         spark.sql("select * from message").printSchema();
-        spark.sql("select * from hashtag").printSchema();
         spark.sql("select * from follower").printSchema();
         spark.sql("select * from user").printSchema();
+        spark.sql("select * from hashtag").printSchema();
+        spark.sql("insert into hashtag values ('1')," +
+                "('1')," +
+                "('1')," +
+                "('2')," +
+                "('2')," +
+                "('3')");
+        spark.sql("select * from hashtag").show();
+        String sql = "select * from hashtag where tag!='1'";
+        Dataset<Row> testDS = spark.sql(sql);
+        testDS.show();
+       /* try {
+            testDS.createGlobalTempView("hashtag");
+            System.out.println("ok");
+        }catch(Exception e){
+            System.out.println("not ok");
+        }
+        spark.newSession().sql("select * from global_temp.hashtag").show();
+
+        //spark.sql("Alter table hashtag ADD PARTITION (i='1')");
+        //spark.sql("ALTER TABLE hashtag DROP PARTITION (i='1')");
+        //spark.sql("select * from hashtag").show();
+
+
         //spark.sql("insert into user values ('"+UserID()+"','user001','user001@email.com','$2a$10$IHdRfnhNgQesPFD5hrUcMOvyx5RrRcklkpXfs9YX4j1qXvouEeVIa'),"+
-        //                "('"+UserID()+"','user002','user002@email.com','$2a$10$NlU0bdBUiegZWZvl6CGpj.wV5YfbDGZ8lYznxWp2NNE4F9cYJJFOe')"
-        //        );
+          //              "('"+UserID()+"','user002','user002@email.com','$2a$10$NlU0bdBUiegZWZvl6CGpj.wV5YfbDGZ8lYznxWp2NNE4F9cYJJFOe')"
+            //    );
+
         //spark.sql("insert into follower values ('1','2'),('2','1')");
         //spark.sql("insert into follower values ('1','2'),('2','1')");
-      /* spark.sql("select * from user").show();
-        JavaRDD<Message> messageRDD = spark.read()
+      //spark.sql("select * from user").show();
+      /*  JavaRDD<Message> messageRDD = spark.read()
                 .textFile("msg.txt")
                 .javaRDD()
                 .map(line -> {
