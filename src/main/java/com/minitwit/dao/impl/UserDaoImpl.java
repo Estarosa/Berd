@@ -58,7 +58,10 @@ public class UserDaoImpl implements UserDao {
         
 		String sql = "select * from follower where follower_id != '"+follower.getId()+"' or followee_id != '"+followee.getId()+"'";
 		Dataset<Row> followerDS = spark.get().sql(sql);
-		followerDS.createOrReplaceTempView("follower");
+		followerDS.createOrReplaceTempView("follower0");
+		spark.get().sql("create table follower1 as select * from follower0");
+		spark.get().sql("drop table if exists follower");
+		spark.get().sql("ALTER TABLE follower1 RENAME TO follower");
 	}
 	
 

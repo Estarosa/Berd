@@ -63,10 +63,12 @@ public class SpSql {
         spark.sql("select * from hashtag").show();
         String sql = "select * from hashtag where tag!='1'";
         Dataset<Row> testDS = spark.sql(sql);
-        testDS.show();
-       /* try {
-            testDS.createGlobalTempView("hashtag");
-            System.out.println("ok");
+        testDS.createOrReplaceTempView("hashtog");
+        spark.sql("create table hashtig as select * from hashtog");
+        spark.sql("drop table if exists hashtag");
+        spark.sql("ALTER TABLE hashtig RENAME TO hashtag");
+        spark.sql("select * from hashtag").show();
+        /*    System.out.println("ok");
         }catch(Exception e){
             System.out.println("not ok");
         }
