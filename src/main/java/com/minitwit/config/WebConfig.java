@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
+import com.minitwit.util.PasswordUtil;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUpload;
@@ -321,9 +322,69 @@ public class WebConfig {
 				res.redirect("/");
 				halt();
 			}
+
 		});
-		
-		
+
+		get("/Pu", (req, res) -> {
+			Map<String, Object> map = new HashMap<>();
+			return new ModelAndView(map, "Pu.ftl");
+		}, new FreeMarkerEngine());
+		/*
+		 * Registers the user.
+		 */
+		post("/Pu", (req, res) -> {
+			System.out.println("00 00 01");
+			User authUser = getAuthenticatedUser(req);
+			Map<String, Object> map = new HashMap<>();
+			User us = new User();
+			System.out.println("00 00 05");
+
+			us.setEmail( (req.queryParams("email") != null && !req.queryParams("email").isEmpty()) ?  req.queryParams("email") : authUser.getEmail());
+			us.setUsername( (req.queryParams("username") != null && !req.queryParams("username").isEmpty()) ? req.queryParams("username")  : authUser.getUsername());
+			us.setPassword((req.queryParams("password") != null && !req.queryParams("password").isEmpty()) ? PasswordUtil.hashPassword(req.queryParams("password") ) : PasswordUtil.hashPassword(authUser.getUsername()));
+			us.setId(authUser.getId());
+			String error = "";
+			if( req.queryParams("password") != null && !req.queryParams("password").isEmpty() && !req.queryParams("password").equals(req.queryParams("password2"))){
+				error = "The two passwords do not match";
+			}
+			System.out.println("00 00 06");
+			if(PasswordUtil.verifyPassword(req.queryParams("cp"),authUser.getPassword())) {
+				if (StringUtils.isEmpty(error)) {
+					System.out.println("00 00 07");
+					User existingUser = service.getUserbyUsername(us.getUsername());
+					if (existingUser == null || existingUser.getUsername().equals(authUser.getUsername())) {
+						System.out.println("00 00 08");
+						service.updateUser(authUser, us);
+						removeAuthenticatedUser(req);
+						addAuthenticatedUser(req, us);
+						System.out.println("00 00 09");
+						res.redirect("/");
+						halt();
+					} else {
+						error = "The username is already taken";
+						System.out.println("00 00 10");
+					}
+				}
+			}else{
+				error = "cp is wrong";
+				System.out.println("00 00 11");
+			}
+			System.out.println("00 00 12");
+			map.put("error", error);
+			System.out.println("00 00 13");
+			return new ModelAndView(map, "Pu.ftl");
+		}, new FreeMarkerEngine());
+		/*
+		 * Checks if the user is already authenticated
+		 */
+		before("/Pu", (req, res) -> {
+			User authUser = getAuthenticatedUser(req);
+			if(authUser == null) {
+				res.redirect("/");
+				halt();
+			}
+		});
+
 		/*
 		 * Registers a new message for the user.
 		 */

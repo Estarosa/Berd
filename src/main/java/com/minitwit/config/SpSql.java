@@ -60,14 +60,6 @@ public class SpSql {
                 "('2')," +
                 "('2')," +
                 "('3')");
-        spark.sql("select * from hashtag").show();
-        String sql = "select * from hashtag where tag!='1'";
-        Dataset<Row> testDS = spark.sql(sql);
-        testDS.createOrReplaceTempView("hashtog");
-        spark.sql("create table hashtig as select * from hashtog");
-        spark.sql("drop table if exists hashtag");
-        spark.sql("ALTER TABLE hashtig RENAME TO hashtag");
-        spark.sql("select * from hashtag").show();
         /*    System.out.println("ok");
         }catch(Exception e){
             System.out.println("not ok");
@@ -79,9 +71,9 @@ public class SpSql {
         //spark.sql("select * from hashtag").show();
 
 
-        //spark.sql("insert into user values ('"+UserID()+"','user001','user001@email.com','$2a$10$IHdRfnhNgQesPFD5hrUcMOvyx5RrRcklkpXfs9YX4j1qXvouEeVIa'),"+
-          //              "('"+UserID()+"','user002','user002@email.com','$2a$10$NlU0bdBUiegZWZvl6CGpj.wV5YfbDGZ8lYznxWp2NNE4F9cYJJFOe')"
-            //    );
+        spark.sql("insert into user values ('"+UserID()+"','user001','user001@email.com','$2a$10$IHdRfnhNgQesPFD5hrUcMOvyx5RrRcklkpXfs9YX4j1qXvouEeVIa'),"+
+                       "('"+UserID()+"','user002','user002@email.com','$2a$10$NlU0bdBUiegZWZvl6CGpj.wV5YfbDGZ8lYznxWp2NNE4F9cYJJFOe')"
+              );
 
         //spark.sql("insert into follower values ('1','2'),('2','1')");
         //spark.sql("insert into follower values ('1','2'),('2','1')");

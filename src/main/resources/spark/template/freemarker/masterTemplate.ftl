@@ -22,7 +22,7 @@
                 <span class="icon-bar"></span>
             </button>
 
-            <a class="navbar-brand" href="/">Berd</a>
+            <a class="navbar-brand" href="/public">Berd</a>
             <a href="/">
             <image src="../images/Berd.png" style="width:30px;height:30px;top:18px;left:65px;position: absolute;" alt ="Berd"/>
             </a>
@@ -31,7 +31,8 @@
                           <div class="input-group">
                                 <input type="text" name="input" class="form-control" required/>
                                      <span class="input-group-btn">
-                                          <button class="btn btn-primary" type="submit"> Search </button>
+                                          <button class="btn btn-primary" type="submit" > Search </button>
+
                                      </span>
                           </div>
                     </form>
@@ -42,7 +43,7 @@
             <ul class="nav navbar-nav navbar-right">
                 <#if user??>
                     <li><a href="/">My Timeline</a></li>
-                    <li><a href="/public">Public Timeline</a></li>
+                    <li><a href="/Pu">Profile update</a></li>
                     <li><a href="/logout">Sign Out</a></li>
                 <#else>
                     <li><a href="/public">Public Timeline</a></li>

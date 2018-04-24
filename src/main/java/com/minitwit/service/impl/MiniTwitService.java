@@ -26,7 +26,7 @@ public class MiniTwitService {
 		userDao = new UserDaoImpl(spark);
 		messageDao = new MessageDaoImpl(spark);
 		}
-
+	public void updateUser(User user0,User user1){ userDao.updateUser(user0,user1);}
 	public List<Message> getSearchUser(String search) {
 		return messageDao.getSearchUser(search);
 	}

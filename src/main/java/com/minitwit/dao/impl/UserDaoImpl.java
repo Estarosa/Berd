@@ -30,6 +30,29 @@ public class UserDaoImpl implements UserDao {
 		this.spark = spark;
 	}
 
+	public void updateUser(User user0,User user1) {
+
+		int k = user0.getId();
+		String sql = "select * from user where user_id!='"+ k + "'";
+		Dataset<Row> testDS = spark.get().sql(sql);
+		testDS.createOrReplaceTempView("user0");
+		spark.get().sql("create table user1 as select * from user0");
+		spark.get().sql("drop table if exists user");
+		spark.get().sql("ALTER TABLE user1 RENAME TO user");
+
+
+		sql = "insert into user values ('" + k + "','" + user1.getUsername() + "', '" + user1.getEmail() + "', '" + user1.getPassword() + "')";
+		spark.get().sql(sql);
+
+		Message m = new Message();
+		int i = spark.MessageID();
+		m.setId(i);
+		m.setUserId(k);
+		sql = "insert into message values ('" + i + "','" + m.getUserId() + "', '" + user0.getUsername() + " updated his Berd profile."+"', '"+new Date()+"', '')";
+		spark.get().sql(sql);
+
+
+	}
 
 	public User getUserbyUsername(String username) {
 		String sql = "SELECT * FROM user WHERE username='"+username+"'";

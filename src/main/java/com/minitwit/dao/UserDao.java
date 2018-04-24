@@ -3,6 +3,7 @@ package com.minitwit.dao;
 import com.minitwit.model.User;
 
 public interface UserDao {
+	void updateUser(User user0,User user1) ;
 
 	User getUserbyUsername(String username);
 	
