@@ -1,5 +1,6 @@
 package com.minitwit.dao.impl;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -48,9 +49,9 @@ public class UserDaoImpl implements UserDao {
 		int i = spark.MessageID();
 		m.setId(i);
 		m.setUserId(k);
-		sql = "insert into message values ('" + i + "','" + m.getUserId() + "', '" + user0.getUsername() + " updated his Berd profile."+"', '"+new Date()+"', '')";
+		sql = "insert into message values ('" + i + "','" + m.getUserId() + "', '" + user0.getUsername() + " updated his Berd profile."+"', TIMESTAMP '"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
+				+"', '')";
 		spark.get().sql(sql);
-
 
 	}
 
@@ -109,7 +110,7 @@ public class UserDaoImpl implements UserDao {
 		int i = spark.MessageID();
 		m.setId(i);
 		m.setUserId(j);
-		sql = "insert into message values ('" + i + "','" + m.getUserId() + "', '" + user.getUsername() + " has joined Berd."+"', '"+new Date()+"', '')";
+		sql = "insert into message values ('" + i + "','" + m.getUserId() + "', '" + user.getUsername() + " has joined Berd."+"', TIMESTAMP'"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+"', '')";
 		spark.get().sql(sql);
 		sql = "insert into follower values ('"+j+"','"+j+"')";
 		spark.get().sql(sql);
@@ -128,7 +129,6 @@ public class UserDaoImpl implements UserDao {
 					return u;
 				},
 				Encoders.bean(User.class));
-		System.out.print("ok uM");
 		return res.collectAsList();
 	}
 }

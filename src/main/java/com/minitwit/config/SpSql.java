@@ -9,6 +9,7 @@ import org.eclipse.jetty.websocket.common.frames.DataFrame;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class SpSql {
 
@@ -16,7 +17,7 @@ public class SpSql {
     private static int i = 0;
     private static int j = 0;
     public SpSql(){
-        String warehouseLocation = new File("spark-warehouse").getAbsolutePath();
+
 
       spark = SparkSession
                 .builder()
@@ -26,6 +27,7 @@ public class SpSql {
                 .enableHiveSupport()
                 .getOrCreate();
         spark.sqlContext().setConf("spark.sql.shuffle.partitions","0");
+        String warehouseLocation = new File("spark-warehouse").getAbsolutePath();
        spark.sql("drop table if exists message");
         spark.sql("create table message ("+
                 "message_id integer ,"+
@@ -54,50 +56,6 @@ public class SpSql {
         spark.sql("select * from follower").printSchema();
         spark.sql("select * from user").printSchema();
         spark.sql("select * from hashtag").printSchema();
-        spark.sql("insert into hashtag values ('1')," +
-                "('1')," +
-                "('1')," +
-                "('2')," +
-                "('2')," +
-                "('3')");
-        /*    System.out.println("ok");
-        }catch(Exception e){
-            System.out.println("not ok");
-        }
-        spark.newSession().sql("select * from global_temp.hashtag").show();
-
-        //spark.sql("Alter table hashtag ADD PARTITION (i='1')");
-        //spark.sql("ALTER TABLE hashtag DROP PARTITION (i='1')");
-        //spark.sql("select * from hashtag").show();
-
-
-        spark.sql("insert into user values ('"+UserID()+"','user001','user001@email.com','$2a$10$IHdRfnhNgQesPFD5hrUcMOvyx5RrRcklkpXfs9YX4j1qXvouEeVIa'),"+
-                       "('"+UserID()+"','user002','user002@email.com','$2a$10$NlU0bdBUiegZWZvl6CGpj.wV5YfbDGZ8lYznxWp2NNE4F9cYJJFOe')"
-              );
-
-        //spark.sql("insert into follower values ('1','2'),('2','1')");
-        //spark.sql("insert into follower values ('1','2'),('2','1')");
-      //spark.sql("select * from user").show();
-      /*  JavaRDD<Message> messageRDD = spark.read()
-                .textFile("msg.txt")
-                .javaRDD()
-                .map(line -> {
-                    String[] parts = line.split(",");
-                    Message m = new Message();
-                    m.setId(Integer.parseInt(parts[0]));
-                    m.setUserId(Integer.parseInt(parts[1]));
-                    m.setText(parts[2]);
-                    //String sql = "insert into message values ('"+this.MessageID()+"','"+parts[1]+"', '"+parts[2]+"', '"+parts[3]+"', '"+"')";
-                    //spark.sql(sql);
-                    //DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-                    //m.setPubDate(dateFormat.parse(parts[3]));
-                    return m;
-                });
-        System.out.println("okok");
-        Dataset<Row> messageDF = spark.createDataFrame(messageRDD, Message.class);
-        messageDF.show();
-        spark.sql("select * from message").show();
-        */
     }
     public SparkSession get(){
         return spark;

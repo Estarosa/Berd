@@ -64,9 +64,7 @@ public class Message {
 	public void setPubDate(Date pubDate) {
 		this.pubDate = pubDate;
 		if(pubDate != null) {
-			pubDateStr = new SimpleDateFormat("yyyy-MM-dd @ HH:mm").format(pubDate);
-		}else{
-			System.out.println("wtf");
+			pubDateStr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(pubDate);
 		}
 	}
 

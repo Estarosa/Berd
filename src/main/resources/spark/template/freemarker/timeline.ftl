@@ -97,7 +97,7 @@
                            <source src="../images/${message.img}">
                          </video>
                         </#if>
-                        <br/>
+                        <br>
                            <#if message.pubDateStr??>
                             <small>&mdash; ${message.pubDateStr}</small>
                            </#if>

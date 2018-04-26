@@ -115,7 +115,7 @@ public class MessageDaoImpl implements MessageDao {
 
 
 	public void insertMessage(Message m) {
-        String sql = "insert into message values ('"+spark.MessageID()+"','"+m.getUserId()+"', '"+m.getText()+"', '"+m.getPubDate()+"', '"+m.getImg()+"')";
+        String sql = "insert into message values ('"+spark.MessageID()+"','"+m.getUserId()+"', '"+m.getText()+"', TIMESTAMP '"+m.getPubDateStr()+"', '"+m.getImg()+"')";
         spark.get().sql(sql);
 
 		String str = m.getText() ;
@@ -141,12 +141,15 @@ public class MessageDaoImpl implements MessageDao {
 					m.setText(rs.getAs("text"));
 					m.setPubDate(rs.getAs("pub_date"));
 					m.setGravatar(GravatarUtil.gravatarURL(rs.getAs("email"), GRAVATAR_DEFAULT_IMAGE_TYPE, GRAVATAR_SIZE));
-					m.setImg(rs.getAs("img"));
-
+					String img = rs.getAs("img");
+					if(img == null || img.isEmpty() || img.equals("null")) {
+                        m.setImg(null);
+					}else{
+                        m.setImg(rs.getAs("img"));
+					}
 					return m;
 				},
 				Encoders.bean(Message.class));
-		System.out.print("ok MM");
 		return res.collectAsList();
 	}
 	private List<Message> UserMapper( Dataset<Row> s) {
@@ -166,7 +169,6 @@ public class MessageDaoImpl implements MessageDao {
 					return m;
 				},
 				Encoders.bean(Message.class));
-		System.out.print("ok UM");
 		return res.collectAsList();
 	}
 	private List<Message> HashtagMapper( Dataset<Row> s) {
@@ -189,7 +191,6 @@ public class MessageDaoImpl implements MessageDao {
 					return m;
 				},
 				Encoders.bean(Message.class));
-		System.out.print("ok HM");
 
 		return res.collectAsList();
 	}
